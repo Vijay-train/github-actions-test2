@@ -3,7 +3,6 @@ on:
   pull_request:
     branches: [develop]
 
-
 # 0) Checkout code locally
 # 1) Install dependencies
 # 2) Check code formatting with prettier
@@ -11,13 +10,13 @@ on:
 # 4) Upload code coverage as Artifact
 # 5) Cache dependencies
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: use NodeJS
+        uses: actions/setup-node@v1
         with:
           node-version: "12.x"
       - run: npm ci
