@@ -37,7 +37,7 @@ jobs:
 
       - name: Deploy to staging
         if: github.event_name == 'push'
-        run: npx surge --project ./build --domain tough-basketball.surge.sh  #this will instal and use surge
+        run: npx surge --project ./build --domain tough-basketball.surge.sh #this will instal and use surge
         env: # surge needs creds to authenticste, we will put those as secrets and access it here.
           SURGE_LOGIN: ${{ secrets.SURGE_LOGIN}}
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN}}
