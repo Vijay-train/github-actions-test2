@@ -1,6 +1,9 @@
 name: CI
 on:
-  pull_request:
+  pull_request: # on PR in develop branch
+    branches: [develop]
+
+  push: # on push in develop branch
     branches: [develop]
 
 # 0) Checkout code locally
@@ -9,6 +12,9 @@ on:
 # 3) Run Automated tests
 # 4) Upload code coverage as Artifact
 # 5) Cache dependencies
+# ## only for Push
+# 6) Build
+# 7) Deploy to staging
 
 jobs:
   build:
@@ -24,3 +30,14 @@ jobs:
       - run: npm test -- --coverage
         env:
           CI: true
+      # build and deploy only on push to develop
+      - name: Build project
+        if: github.event_name == 'push' # not the if condition only only on push
+        run: npm run build
+
+      - name: Deploy to staging
+        if: github.event_name == 'push'
+        run: npx surge --project ./build --domain tough-basketball.surge.sh  #this will instal and use surge
+        env: # surge needs creds to authenticste, we will put those as secrets and access it here.
+          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN}}
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN}}
