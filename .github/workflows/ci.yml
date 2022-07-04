@@ -21,6 +21,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Cache modules
+        uses: actions/cache@v1 # Action to cache dependencies based on some key. If key is found, then it will pick up from cache
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json')}}
       - name: use NodeJS
         uses: actions/setup-node@v1
         with:
