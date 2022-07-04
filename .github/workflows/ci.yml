@@ -24,29 +24,36 @@ jobs:
       SURGE_TOKEN: ${{ secrets.SURGE_TOKEN}}
 
     steps:
+      # Step : run some log output
+      - name : Debug log
+        run: |
+          echo github.event_name
+          echo github.ref
+          
+     
       # Step : Get code downloaded
       - uses: actions/checkout@v2
 
       # Step : Cache any modules using built in action.
       - name: Cache modules
-        uses: actions/cache@v1
+        uses: actions/cache@v1 
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json')}}
-
+      
       # Step : Setup node
       - name: use NodeJS
         uses: actions/setup-node@v1
         with:
           node-version: "12.x"
-
+      
       # Step : Install node
       - run: npm ci
-
+      
       # Step :  Run the npm script that we have defined in the package.json.
       #         This one, just checks the format using Pretier
       - run: npm run format:check
-
+      
       # Step : Run test, this is defined as a scrit in Package.json
       - run: npm test -- --coverage
         env: # Pattern : to use environmental variables
@@ -59,7 +66,7 @@ jobs:
         with:
           name: code-coverage
           path: coverage
-
+      
       # build and deploy only on push to develop
       - name: Build project
         if: github.event_name == 'push' # note the if condition only only on push
@@ -74,11 +81,12 @@ jobs:
           name: build
           path: build
 
-      - name: Deploy to staging
+      - name: Deploy to staging 
         if: github.event_name == 'push' && github.ref == 'refs/head/develop'
         run: npx surge --project ./build --domain tough-basketball.surge.sh #this will instal and use surge
 
-      - name: Deploy to main
+      - name: Deploy to main 
         if: github.event_name == 'push' && github.ref == 'refs/head/main'
-        run: npx surge --project ./build --domain elfin-fairies.surge.sh #this will instal and use surge
+        run: npx surge --project ./build --domain elfin-fairies.surge.sh  #this will instal and use surge
+
 
