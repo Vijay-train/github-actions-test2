@@ -35,7 +35,7 @@ jobs:
       - run: npm test -- --coverage
         env:
           CI: true
-      
+
       # Step : upload Test coverage
       # Pattern : How to upload artifacts to WF run
       - name: upload Test coverage
@@ -50,7 +50,7 @@ jobs:
 
       # Step : upload Build
       # Pattern : How to upload artifacts to WF run
-      - name: upload Build 
+      - name: upload Build
         if: github.event_name == 'push' # not the if condition only only on push
         uses: actions/upload-artifact@v1
         with:
