@@ -24,6 +24,12 @@ jobs:
       SURGE_TOKEN: ${{ secrets.SURGE_TOKEN}}
 
     steps:
+      # Step : run some log output
+      - name: Debug log
+        run: |
+          echo ${{ github.event_name }}
+          echo ${{ github.ref }}
+
       # Step : Get code downloaded
       - uses: actions/checkout@v2
 
