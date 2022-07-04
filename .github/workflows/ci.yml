@@ -1,10 +1,10 @@
 name: CI
 on:
-  pull_request: # on PR in develop branch
-    branches: [develop]
+  pull_request: # on PR in develop and master branch
+    branches: [develop, main]
 
-  push: # on push in develop branch
-    branches: [develop]
+  push: # on push in develop and master branch
+    branches: [develop, main]
 
 # 0) Checkout code locally
 # 1) Install dependencies
@@ -19,25 +19,66 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env: # surge needs creds to authenticate, we will put those as secrets and access it here.
+      SURGE_LOGIN: ${{ secrets.SURGE_LOGIN}} # Pattern : usage of secrets
+      SURGE_TOKEN: ${{ secrets.SURGE_TOKEN}}
+
     steps:
+      # Step : Get code downloaded
       - uses: actions/checkout@v2
+
+      # Step : Cache any modules using built in action.
+      - name: Cache modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json')}}
+
+      # Step : Setup node
       - name: use NodeJS
         uses: actions/setup-node@v1
         with:
           node-version: "12.x"
+
+      # Step : Install node
       - run: npm ci
+
+      # Step :  Run the npm script that we have defined in the package.json.
+      #         This one, just checks the format using Pretier
       - run: npm run format:check
+
+      # Step : Run test, this is defined as a scrit in Package.json
       - run: npm test -- --coverage
-        env:
+        env: # Pattern : to use environmental variables
           CI: true
+
+      # Step : upload Test coverage
+      # Pattern : How to upload artifacts to WF run
+      - name: upload Test coverage
+        uses: actions/upload-artifact@v1
+        with:
+          name: code-coverage
+          path: coverage
+
       # build and deploy only on push to develop
       - name: Build project
-        if: github.event_name == 'push' # not the if condition only only on push
+        if: github.event_name == 'push' # note the if condition only only on push
         run: npm run build
 
+      # Step : upload Build
+      # Pattern : How to upload artifacts to WF run
+      - name: upload Build
+        if: github.event_name == 'push' # note the if condition only only on push
+        uses: actions/upload-artifact@v1
+        with:
+          name: build
+          path: build
+
       - name: Deploy to staging
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && github.ref == 'refs/head/develop'
         run: npx surge --project ./build --domain tough-basketball.surge.sh #this will instal and use surge
-        env: # surge needs creds to authenticste, we will put those as secrets and access it here.
-          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN}}
-          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN}}
+
+      - name: Deploy to main
+        if: github.event_name == 'push' && github.ref == 'refs/head/main'
+        run: npx surge --project ./build --domain elfin-fairies.surge.sh #this will instal and use surge
+
