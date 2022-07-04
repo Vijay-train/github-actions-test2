@@ -17,6 +17,39 @@ on:
 # 7) Deploy to staging
 
 jobs:
+  # Job demonstrates various other intersting learnings from action
+  docker-job-sample:
+    runs-on: ubuntu-latest
+    container: node:13.5.0-alpine3.10
+
+    steps:
+      - name: step in container
+        run: |
+          node -v
+
+      - name: Contains Functions
+        run: |
+          echo "Is string llo in Helllo world? - ${{ Contains('Hello world','llo')}} "
+
+      - name: Dump GitHub context
+        id: github_context_step
+        run: echo '${{ toJSON(github) }}'
+
+      - name: Dump job context
+        run: echo '${{ toJSON(job) }}'
+
+      - name: Dump steps context
+        run: echo '${{ toJSON(steps) }}'
+
+      - name: Dump runner context
+        run: echo '${{ toJSON(runner) }}'
+
+      - name: Dump strategy context
+        run: echo '${{ toJSON(strategy) }}'
+
+      - name: Dump matrix context
+        run: echo '${{ toJSON(matrix) }}'
+
   build:
     runs-on: ubuntu-latest
     env: # surge needs creds to authenticate, we will put those as secrets and access it here.
@@ -80,10 +113,12 @@ jobs:
           name: build
           path: build
 
+      # Step : Deploy to staging (only if the push in [develop] branch)
       - name: Deploy to staging
         if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
         run: npx surge --project ./build --domain tough-basketball.surge.sh #this will instal and use surge
 
+      # Step : Deploy to prod (only if the push in [main] branch)
       - name: Deploy to main
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: npx surge --project ./build --domain elfin-fairies.surge.sh #this will instal and use surge
