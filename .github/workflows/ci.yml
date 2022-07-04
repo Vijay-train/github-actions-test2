@@ -81,10 +81,10 @@ jobs:
           path: build
 
       - name: Deploy to staging
-        if: github.event_name == 'push' && github.ref == 'refs/head/develop'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
         run: npx surge --project ./build --domain tough-basketball.surge.sh #this will instal and use surge
 
       - name: Deploy to main
-        if: github.event_name == 'push' && github.ref == 'refs/head/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: npx surge --project ./build --domain elfin-fairies.surge.sh #this will instal and use surge
 
