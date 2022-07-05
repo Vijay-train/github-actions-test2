@@ -1,10 +1,10 @@
 name: CI
 on:
   pull_request: # on PR in develop and master branch
-    branches: [develop, main]
+    branches: [develop11, main11]
 
   push: # on push in develop and master branch
-    branches: [develop, main]
+    branches: [develop11, main11]
 
 # 0) Checkout code locally
 # 1) Install dependencies
