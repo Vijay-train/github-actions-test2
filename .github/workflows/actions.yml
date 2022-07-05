@@ -11,4 +11,4 @@ jobs:
         with:
           who-to-greet: "OMG"
       - run: |
-         echo "Time returnsed is ${{ steps.Hello.outputs.time}}"
+          echo "Time returnsed is ${{ steps.Hello.outputs.time}}"
